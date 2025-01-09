@@ -5,6 +5,8 @@ import Image from "next/image";
 import { subscriptionTiresInOrder } from "../data/subscriptionTires";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatCompactNumber } from "@/lib/utils";
+import Link from "next/link";
+import BrandLogo from "@/components/BrandLogo";
 
 export default function HomePage() {
   return (
@@ -52,6 +54,83 @@ export default function HomePage() {
             ))}
         </div>
       </section>
+      <footer className="container pt-16 pb-8 flex flex-col sm:flex-row gap-8 sm:gap-4 justify-between items-start">
+        <Link href="/">
+          <BrandLogo />
+        </Link>
+        <div className="flex flex-col sm:flex-row gap-8">
+          <div className="flex flex-col gap-8">
+            <FooterLinkGroup
+              title="Help"
+              links={[
+                { href: "#", label: "PPP Discounts" },
+                { href: "#", label: "Holiday discounts" },
+                { href: "#", label: "Time based discounts" },
+                { href: "#", label: "Discount API" },
+              ]}
+            />
+            <FooterLinkGroup
+              title="Solution"
+              links={[
+                { href: "#", label: "Newsletter" },
+                { href: "#", label: "Saas Business" },
+                { href: "#", label: "Online Courses" },
+              ]}
+            />
+          </div>
+          <div className="flex flex-col gap-8">
+            <FooterLinkGroup
+              title="Features"
+              links={[
+
+                { href: "#", label: "Holiday discounts" },
+                { href: "#", label: "Time based discounts" },
+                { href: "#", label: "Benefits of geographical pricing?" },
+              ]}
+            />
+            <FooterLinkGroup
+              title="Tools"
+              links={[
+                { href: "#", label: "Salary converter" },
+                { href: "#", label: "Coupon generator" },
+                { href: "#", label: "Stripe app" },
+                { href: "#", label: "SaaS pricing calculator" },
+              ]}
+            />
+            <FooterLinkGroup
+              title="Company"
+              links={[
+                { href: "#", label: "Affiliate" },
+                { href: "#", label: "Twitter" },
+                { href: "#", label: "Terms of service" },
+                { href: "#", label: "Privacy" },
+
+              ]}
+            />
+          </div>
+          <div className="flex flex-col gap-8">
+            <FooterLinkGroup
+              title="Integrations"
+              links={[
+                { href: "#", label: "Lemon Squeezy" },
+                { href: "#", label: "Gumroad" },
+                { href: "#", label: "Stripe" },
+                { href: "#", label: "Chargebee" },
+                { href: "#", label: "Whop" },
+              ]}
+            />
+            <FooterLinkGroup
+              title="Tutorials"
+              links={[
+                { href: "#", label: "Any website" },
+                { href: "#", label: "kajabi" },
+                { href: "#", label: "Podia" },
+                { href: "#", label: "Circle.so" },
+              ]}
+            />
+          </div>
+        </div>
+      </footer>
     </>
   );
 }
@@ -106,6 +185,23 @@ function Feature({ children, className }: { children: React.ReactNode, className
     <div className={cn("flex items-center gap-2", className)}>
       <CheckIcon className="size-4 stroke-accent bg-accent/25 rounded-full p-0.5" />
       <span>{children}</span>
+    </div>
+  );
+}
+
+function FooterLinkGroup({ title, links }: { title: string, links: { href: string, label: string; }[]; }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <h3 className="font-semibold">{title}</h3>
+      <ul className="flex flex-col gap-2 text-sm">
+        {links.map(link => (
+          <li key={link.label}>
+            <Link href={link.href}>
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
