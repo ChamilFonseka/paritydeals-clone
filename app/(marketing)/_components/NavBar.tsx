@@ -20,8 +20,10 @@ function NavBar() {
                 </Link>
                 <span className="text-lg">
                     <SignedIn>
-                        {/* <Link href="/dashboard">Dashboard</Link> */}
-                        <UserButton />
+                        <div className="flex items-center gap-10">
+                            <Link href="/dashboard">Dashboard</Link>
+                            <UserButton />
+                        </div>
                     </SignedIn>
                     <SignedOut>
                         <SignInButton>Login</SignInButton>
