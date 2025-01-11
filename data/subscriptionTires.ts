@@ -1,3 +1,5 @@
+export type TierNames = keyof typeof subscriptionTires;
+
 export const subscriptionTires = {
     Free: {
         name: "Free",
