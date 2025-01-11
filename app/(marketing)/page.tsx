@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { SignUpButton } from "@clerk/nextjs";
 import { ArrowRightIcon, CheckIcon } from "lucide-react";
 import Image from "next/image";
-import { subscriptionTiresInOrder } from "../data/subscriptionTires";
+import { subscriptionTiresInOrder } from "@/data/subscriptionTires";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatCompactNumber } from "@/lib/utils";
 import Link from "next/link";
