@@ -9,3 +9,7 @@ const formatter = new Intl.NumberFormat(undefined, { notation: "compact" });
 export function formatCompactNumber(number: number) {
   return formatter.format(number);
 }
+
+export function removeTrailingSlash(url: string) {
+  return url.replace(/\/$/, "");
+}
