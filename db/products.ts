@@ -10,6 +10,12 @@ export function findProducts(clerkUserId: string, limit?: number) {
     });
 }
 
+export function findProduct(id: string, clerkUserId: string) {
+    return db.query.products.findFirst({
+        where: and(eq(products.id, id), eq(products.clerkUserId, clerkUserId)),
+    });
+}
+
 export async function createProduct(product: typeof products.$inferInsert) {
     const [newProduct] = await db
         .insert(products)
@@ -29,6 +35,15 @@ export async function createProduct(product: typeof products.$inferInsert) {
     }
 
     return newProduct.id;
+}
+
+export async function updateProduct(productId: string, product: Partial<typeof products.$inferInsert>) {
+    const { rowCount } = await db
+        .update(products)
+        .set(product)
+        .where(and(eq(products.id, productId), eq(products.clerkUserId, product.clerkUserId!)));
+    
+    return rowCount > 0;
 }
 
 export async function deleteProduct(id: string, userId: string) {
