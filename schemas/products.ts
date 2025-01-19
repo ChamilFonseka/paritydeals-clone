@@ -12,3 +12,28 @@ export const productDetailsSchema = z.object({
     }).transform(removeTrailingSlash),
     description: z.string().optional(),
 });
+
+export const productCountryDiscountsSchema = z.object({
+    groups: z.array(z.object({
+        countryGroupId: z.string().min(1, "Required"),
+        discountPercentage: z
+            .number()
+            .max(100)
+            .min(1)
+            .or(z.nan())
+            .transform(n => isNaN(n) ? undefined : n)
+            .optional(),
+        coupon: z.string().optional(),
+    })
+    .refine(
+        value => {
+            const hasCoupon = !!value.coupon && value.coupon?.length > 0;
+            const hasDiscount = !!value.discountPercentage
+            return !(hasCoupon && !hasDiscount);
+        },
+        {
+            message: "Coupon requires a discount percentage.",
+            path: ["root"],
+        }
+    )),
+});
