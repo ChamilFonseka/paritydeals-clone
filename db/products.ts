@@ -2,6 +2,7 @@ import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/drizzle/db";
 import { countryGroupDiscounts, productCustomizations, products } from "@/drizzle/schema";
 import { BatchItem } from "drizzle-orm/batch";
+import { set } from "zod";
 
 export function findProducts(userId: string, limit?: number) {
     return db.query.products.findMany({
@@ -91,7 +92,7 @@ export async function updateCountryDiscounts(
     if (!product) return false;
 
     const statements: BatchItem<"pg">[] = [];
-    if(deleteGroup.length > 0) {
+    if (deleteGroup.length > 0) {
         statements.push(
             db.delete(countryGroupDiscounts).where(
                 and(
@@ -102,23 +103,23 @@ export async function updateCountryDiscounts(
         );
     }
 
-    if(insertGroup.length > 0) {
+    if (insertGroup.length > 0) {
         statements.push(
             db.insert(countryGroupDiscounts).values(insertGroup)
-            .onConflictDoUpdate({
-                target: [
-                    countryGroupDiscounts.productId, 
-                    countryGroupDiscounts.countryGroupId
-                ],
-                set: {
-                    coupon: sql.raw(`excluded.${countryGroupDiscounts.coupon.name}`),
-                    discountPercentage: sql.raw(`excluded.${countryGroupDiscounts.discountPercentage.name}`),
-                }
-            })
+                .onConflictDoUpdate({
+                    target: [
+                        countryGroupDiscounts.productId,
+                        countryGroupDiscounts.countryGroupId
+                    ],
+                    set: {
+                        coupon: sql.raw(`excluded.${countryGroupDiscounts.coupon.name}`),
+                        discountPercentage: sql.raw(`excluded.${countryGroupDiscounts.discountPercentage.name}`),
+                    }
+                })
         );
     }
 
-    if(statements.length > 0) {
+    if (statements.length > 0) {
         await db.batch(statements as [BatchItem<'pg'>]);
     }
 }
@@ -129,4 +130,25 @@ export async function deleteProduct(id: string, userId: string) {
             and(eq(products.id, id), eq(products.clerkUserId, userId))
         );
     return rowCount > 0;
+}
+
+export async function findProductCustomization(productId: string, userId: string) {
+    const data = await db.query.products.findFirst({
+        where: and(eq(products.id, productId), eq(products.clerkUserId, userId)),
+        with: {
+            productCustomization: true
+        }
+    });
+
+    return data?.productCustomization;
+}
+
+export async function updateProductCustomization(productId: string, userId: string, data: Partial<typeof productCustomizations.$inferInsert>) {
+    const product = findProduct(productId, userId);
+    if (!product) return;
+
+    await db
+        .update(productCustomizations)
+        .set(data)
+        .where(eq(productCustomizations.productId, productId));
 }

@@ -1,16 +1,19 @@
 'use server';
 
 import { z } from "zod";
-import { productCountryDiscountsSchema, productDetailsSchema } from "@/schemas/products";
+import { productCountryDiscountsSchema, productCustomizationSchema, productDetailsSchema } from "@/schemas/products";
 import { auth } from "@clerk/nextjs/server";
 import {
     createProduct as createProductDb,
     deleteProduct as deleteProductDb,
     updateProduct as updateProductDB,
-    updateCountryDiscounts as updateCountryDiscountsDb
+    updateCountryDiscounts as updateCountryDiscountsDb,
+    updateProductCustomization as updateProductCustomizationDb
 } from "@/db/products";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { canCustomizeBanner } from "@/permissions";
+import { error } from "console";
 
 export async function createProduct(productDetails: z.infer<typeof productDetailsSchema>)
     : Promise<{ error: boolean, message: string; } | undefined> {
@@ -82,6 +85,26 @@ export async function updateCountryDiscounts(productId: string, countryDiscounts
     await updateCountryDiscountsDb(deleteIds, insert, productId, userId);
 
     return { error: false, message: "Country discounts updated successfully." };
+}
+
+export async function updateProductCustomization(id: string, customizationDetails: z.infer<typeof productCustomizationSchema>) {
+    await auth.protect();
+    const { userId } = await auth();
+    const { success, data } = productCustomizationSchema.safeParse(customizationDetails);
+    const canCustomize = await canCustomizeBanner(userId!);
+
+    if(!success || userId == null || !canCustomize) {
+        return {
+            error: true,
+            message: "These was an error updating your banner."
+        }
+    }
+
+    await updateProductCustomizationDb(id, userId, data);
+
+    revalidatePath('/dashboard');
+
+    return {error: false, message: "Banner updated"}
 }
 
 export async function deleteProduct(id: string) {

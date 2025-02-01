@@ -1,9 +1,11 @@
 import CountryDiscountsForm from "@/app/dashboard/_components/forms/CountryDiscountsForm";
+import { ProductCustomizationForm } from "@/app/dashboard/_components/forms/ProductCustomizationForm";
 import ProductDetailsForm from "@/app/dashboard/_components/forms/ProductDetailsForm";
 import PageWithBackButton from "@/app/dashboard/_components/PageWithBackButton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { findProduct, findProductCountryGroups } from "@/db/products";
+import { findProduct, findProductCountryGroups, findProductCustomization } from "@/db/products";
+import { canCustomizeBanner, canRemoveBranding } from "@/permissions";
 import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 
@@ -37,7 +39,9 @@ export default async function ProductEditPage({
                 <TabsContent value="country">
                     <CountryTab productId={productId} userId={userId!} />
                 </TabsContent>
-                <TabsContent value="customization">Settings.</TabsContent>
+                <TabsContent value="customization">
+                    <CustomizationsTab productId={productId} userId={userId!} />
+                </TabsContent>
             </Tabs>
         </PageWithBackButton>
     );
@@ -83,6 +87,33 @@ async function CountryTab({
                 <CountryDiscountsForm
                     productId={productId}
                     countryGroups={countryGroups}
+                />
+            </CardContent>
+        </Card>
+    );
+}
+
+async function CustomizationsTab({
+    productId,
+    userId,
+}: {
+    productId: string;
+    userId: string;
+}) {
+    const customization = await findProductCustomization(productId, userId);
+
+    if (!customization) return notFound();
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-xl">Banner Customization</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <ProductCustomizationForm
+                    canRemoveBranding={await canRemoveBranding(userId)}
+                    canCustomizeBanner={await canCustomizeBanner(userId)}
+                    customization={customization}
                 />
             </CardContent>
         </Card>

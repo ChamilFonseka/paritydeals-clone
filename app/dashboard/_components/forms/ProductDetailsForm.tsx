@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createProduct, updateProduct } from "@/actions/products";
 import { productDetailsSchema } from "@/schemas/products";
 import { useToast } from "@/hooks/use-toast";
+import { RequiredLabelIcon } from "@/components/RequiredLabelIcon";
 
 export default function ProductDetailsForm({
     product
@@ -63,7 +64,10 @@ export default function ProductDetailsForm({
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Product Name</FormLabel>
+                                <FormLabel>
+                                    Product Name
+                                    <RequiredLabelIcon />
+                                </FormLabel>
                                 <FormControl>
                                     <Input placeholder="Product Name" {...field} />
                                 </FormControl>
@@ -76,7 +80,10 @@ export default function ProductDetailsForm({
                         name="url"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Enter your website URL</FormLabel>
+                                <FormLabel>
+                                    Enter your website URL
+                                    <RequiredLabelIcon />
+                                </FormLabel>
                                 <FormControl>
                                     <Input placeholder="https://your-website" {...field} />
                                 </FormControl>
