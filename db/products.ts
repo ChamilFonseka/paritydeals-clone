@@ -1,8 +1,7 @@
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/drizzle/db";
 import { countryGroupDiscounts, productCustomizations, products } from "@/drizzle/schema";
 import { BatchItem } from "drizzle-orm/batch";
-import { set } from "zod";
 
 export function findProducts(userId: string, limit?: number) {
     return db.query.products.findMany({
@@ -151,4 +150,12 @@ export async function updateProductCustomization(productId: string, userId: stri
         .update(productCustomizations)
         .set(data)
         .where(eq(productCustomizations.productId, productId));
+}
+
+export async function getProductCount(userId: string) {
+    const counts = await db.select({ productCount: count() })
+    .from(products)
+    .where(eq(products.clerkUserId, userId))
+
+    return counts[0]?.productCount ?? 0;
 }

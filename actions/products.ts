@@ -12,7 +12,7 @@ import {
 } from "@/db/products";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { canCustomizeBanner } from "@/permissions";
+import { canCreateProduct, canCustomizeBanner } from "@/permissions";
 import { error } from "console";
 
 export async function createProduct(productDetails: z.infer<typeof productDetailsSchema>)
@@ -20,8 +20,9 @@ export async function createProduct(productDetails: z.infer<typeof productDetail
     await auth.protect();
     const { userId } = await auth();
     const { success, data } = productDetailsSchema.safeParse(productDetails);
+    const canCreate = await canCreateProduct(userId);
 
-    if (!success || !userId) {
+    if (!success || !userId || !canCreate) {
         return { error: true, message: "An error occurred while creating your product." };
     }
 
