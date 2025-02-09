@@ -1,5 +1,7 @@
 export type TierNames = keyof typeof subscriptionTires;
 
+export type PaidTierNames = Exclude<TierNames, "Free">
+
 export const subscriptionTires = {
     Free: {
         name: "Free",
@@ -9,7 +11,7 @@ export const subscriptionTires = {
         canAccessAnalytics: false,
         canCustomizeBanner: false,
         canReomveBranding: false,
-        // stripePriceId: undefined,
+        stripePriceId: null,
     },
     Basic: {
         name: "Basic",
@@ -19,7 +21,7 @@ export const subscriptionTires = {
         canAccessAnalytics: true,
         canCustomizeBanner: false,
         canReomveBranding: true,
-        // stripePriceId: env.BASIC_PLAN_STRIPE_PRICE_ID,
+        stripePriceId: process.env.BASIC_PLAN_STRIPE_PRICE_ID,
     },
     Standard: {
         name: "Standard",
@@ -29,7 +31,7 @@ export const subscriptionTires = {
         canAccessAnalytics: true,
         canCustomizeBanner: true,
         canReomveBranding: true,
-        // stripePriceId: env.STANDARD_PLAN_STRIPE_PRICE_ID,
+        stripePriceId: process.env.STANDARD_PLAN_STRIPE_PRICE_ID,
     },
     Premium: {
         name: "Premium",
@@ -39,7 +41,7 @@ export const subscriptionTires = {
         canAccessAnalytics: true,
         canCustomizeBanner: true,
         canReomveBranding: true,
-        // stripePriceId: env.PREMIUM_PLAN_STRIPE_PRICE_ID,
+        stripePriceId: process.env.PREMIUM_PLAN_STRIPE_PRICE_ID,
     },
 } as const;
 
