@@ -1,6 +1,6 @@
 export type TierNames = keyof typeof subscriptionTires;
 
-export type PaidTierNames = Exclude<TierNames, "Free">
+export type PaidTierNames = Exclude<TierNames, "Free">;
 
 export const subscriptionTires = {
     Free: {
@@ -51,3 +51,9 @@ export const subscriptionTiresInOrder = [
     subscriptionTires.Standard,
     subscriptionTires.Premium,
 ] as const;
+
+export function getTierByPriceId(stripePriceId: string) {
+    return Object.values(subscriptionTires).find(
+        tier => tier.stripePriceId === stripePriceId
+    );
+}

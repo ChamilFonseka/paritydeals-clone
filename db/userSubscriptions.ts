@@ -1,5 +1,5 @@
 import { db } from "@/drizzle/db";
-import { eq } from "drizzle-orm";
+import { eq, SQL } from "drizzle-orm";
 import { products, userSubscriptions } from "@/drizzle/schema";
 import { subscriptionTires } from "@/data/subscriptionTires";
 
@@ -26,11 +26,21 @@ export async function getUserSubscription(userId: string) {
 }
 
 export async function findUserSubscriptionTier(userId: string) {
-    const subscription = await getUserSubscription(userId); 
+    const subscription = await getUserSubscription(userId);
 
     if (subscription) {
         return subscriptionTires[subscription.tier];
     }
 
     throw new Error('User subscription not found');
+}
+
+export async function updateUserSubscription(
+    where: SQL,
+    data: Partial<typeof userSubscriptions.$inferInsert>
+) {
+    await db
+        .update(userSubscriptions)
+        .set(data)
+        .where(where);
 }
