@@ -2,6 +2,7 @@ import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/drizzle/db";
 import { countryGroupDiscounts, productCustomizations, products } from "@/drizzle/schema";
 import { BatchItem } from "drizzle-orm/batch";
+import { removeTrailingSlash } from "@/lib/utils";
 
 export function findProducts(userId: string, limit?: number) {
     return db.query.products.findMany({
@@ -159,3 +160,71 @@ export async function getProductCount(userId: string) {
 
     return counts[0]?.productCount ?? 0;
 }
+
+export async function getProductForBanner({
+    id,
+    countryCode,
+    url,
+  }: {
+    id: string
+    countryCode: string
+    url: string
+  }) {
+    const data = await db.query.products.findFirst({
+      where: ({ id: idCol, url: urlCol }, { eq, and }) =>
+        and(eq(idCol, id), eq(urlCol, removeTrailingSlash(url))),
+      columns: {
+        id: true,
+        clerkUserId: true,
+      },
+      with: {
+        productCustomization: true,
+        countryGroupDiscounts: {
+          columns: {
+            coupon: true,
+            discountPercentage: true,
+          },
+          with: {
+            countryGroup: {
+              columns: {},
+              with: {
+                countries: {
+                  columns: {
+                    id: true,
+                    name: true,
+                  },
+                  limit: 1,
+                  where: ({ code }, { eq }) => eq(code, countryCode),
+                },
+              },
+            },
+          },
+        },
+      },
+    })
+  
+    const discount = data?.countryGroupDiscounts.find(
+      discount => discount.countryGroup.countries.length > 0
+    )
+    const country = discount?.countryGroup.countries[0]
+    const product =
+      data == null || data.productCustomization == null
+        ? undefined
+        : {
+            id: data.id,
+            clerkUserId: data.clerkUserId,
+            customization: data.productCustomization,
+          }
+  
+    return {
+      product,
+      country,
+      discount:
+        discount == null
+          ? undefined
+          : {
+              coupon: discount.coupon,
+              percentage: discount.discountPercentage,
+            },
+    }
+  }

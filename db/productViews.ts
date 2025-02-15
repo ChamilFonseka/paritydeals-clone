@@ -16,3 +16,20 @@ export async function getProductViewCount(userId: string, startDate: Date) {
 
     return counts[0]?.productViewCount ?? 0;
 }
+
+export async function createProductView({
+    productId,
+    countryId,
+}: {
+    productId: string;
+    countryId?: string;
+}) {
+    const [newRow] = await db
+        .insert(productViews)
+        .values({
+            productId: productId,
+            visitedAt: new Date(),
+            countryId: countryId || 'unknown',
+        })
+        .returning({ id: productViews.id });
+}
